@@ -26,7 +26,7 @@ AIwanttoberichCharacter::AIwanttoberichCharacter()
 	RunSpeed = 1000.f;
 	CrouchSpeed = 300.f;
 	SlideSpeed = 1200.f;
-	SlideDuration = 0.75f; // 슬라이딩 지속 시간(초);
+	SlideDuration = 1.0f; // 슬라이딩 지속 시간(초);
 	bIsRunning = false;
 	bIsCrouching = false;
 	bIsSliding = false;
@@ -136,31 +136,29 @@ void AIwanttoberichCharacter::Look(const FInputActionValue& Value)
 }
 void AIwanttoberichCharacter::StartJump()
 {
-	if (!bIsJumping)
+	if (bIsRunning)
 	{
-		// 점프 시작 시 현재 속도 저장
-		JumpStartSpeed = GetCharacterMovement()->Velocity.Size();
-		bIsJumping = true;
-
-		// 점프를 시작합니다
-		ACharacter::Jump();
+		// 달리기 상태에서 점프 시작 시 속도 유지
+		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.GetSafeNormal() * RunSpeed;
 	}
+	ACharacter::Jump();
+	bIsJumping = true;
 }
 void AIwanttoberichCharacter::EndJump()
 {
-	if (bIsJumping)
+	// 점프가 끝난 후에도 속도 유지
+	if (bIsRunning)
 	{
-		// 점프가 끝나면 속도 복원
-		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.GetSafeNormal() * JumpStartSpeed;
-		bIsJumping = false;
+		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.GetSafeNormal() * RunSpeed;
 	}
+	bIsJumping = false;
 }
 void AIwanttoberichCharacter::MaintainJumpSpeed(float DeltaTime)
 {
-	if (GetCharacterMovement()->IsFalling())
+	if (GetCharacterMovement()->Velocity.Size() < RunSpeed)
 	{
 		// 점프 중 속도 유지
-		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.GetSafeNormal() * JumpStartSpeed;
+		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.GetSafeNormal() * RunSpeed;
 	}
 }
 void AIwanttoberichCharacter::StartRunning(const FInputActionValue& Value)
@@ -200,11 +198,11 @@ void AIwanttoberichCharacter::StopCrouching(const FInputActionValue& Value)
 
 void AIwanttoberichCharacter::StartSliding()
 {
-	if (CanSlide())
+	if (CanSlide()&&!bIsSliding)
 	{
 		bIsSliding = true;
 		SlideStartTime = GetWorld()->GetTimeSeconds();
-		SlideInitialSpeed = GetCharacterMovement()->IsFalling()&&GetCharacterMovement()->MaxWalkSpeed==1000 ? 1300.0f : 1200.0f;
+		SlideInitialSpeed = GetCharacterMovement()->IsFalling()&& GetCharacterMovement()->MaxWalkSpeed == 1000 ? 1300.0f : 1200.0f;
 		GetCharacterMovement()->MaxWalkSpeed = SlideInitialSpeed;
 
 		// 슬라이딩 방향 설정
@@ -269,7 +267,6 @@ void AIwanttoberichCharacter::UpdateCharacterSpeed()
 void AIwanttoberichCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
-
 	//착지 후 슬라이딩 발동
 	if (bIsSliding)
 	{
