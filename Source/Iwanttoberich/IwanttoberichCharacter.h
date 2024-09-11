@@ -49,8 +49,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 	
-	// Enhanced Input ¾×¼Ç
-	//´Ş¸®±â ¿ìÅ©¸®±â ½½¶óÀÌµå
+	// Enhanced Input ì•¡ì…˜
+	//ë‹¬ë¦¬ê¸° ìš°í¬ë¦¬ê¸° ìŠ¬ë¼ì´ë“œ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RunAction;
 
@@ -60,12 +60,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SlideAction;
 protected:
-	//´Ş¸®±â , ¿õÅ©¸®±â, ½½¶óÀÌµù º¯¼ö ¼±¾ğ 
+	//ë‹¬ë¦¬ê¸° , ì›…í¬ë¦¬ê¸°, ìŠ¬ë¼ì´ë”© ë³€ìˆ˜ ì„ ì–¸ 
 	bool bIsRunning;
 	bool bIsCrouching;
 	bool bIsSliding;
 	bool bIsJumping;
-	//Ä³¸¯ÅÍ ¼Óµµ
+	//ìºë¦­í„° ì†ë„
 	float WalkSpeed;
 	float RunSpeed;
 	float CrouchSpeed;
@@ -74,15 +74,15 @@ protected:
 	float SlideInitialSpeed;
 	float JumpStartSpeed;
 	float SlideEndSpeed = 600.0f;
-	//½½¶óÀÌµù Áö¼Ó ½Ã°£
+	//ìŠ¬ë¼ì´ë”© ì§€ì† ì‹œê°„
 	float SlideDuration=0.75f;
 
 
-	//½½¶óÀÌµù Å¸ÀÌ¸Ó
+	//ìŠ¬ë¼ì´ë”© íƒ€ì´ë¨¸
 	FTimerHandle SlideTimerHandle;
 
 
-	//´Ş¸®±â, ¿õÅ©¸®±â, ½½¶óÀÌµù º¯¼ö ¼±¾ğ
+	//ë‹¬ë¦¬ê¸°, ì›…í¬ë¦¬ê¸°, ìŠ¬ë¼ì´ë”© ë³€ìˆ˜ ì„ ì–¸
 	void StartRunning(const FInputActionValue& Value);
 	void StopRunning(const FInputActionValue& Value);
 	void StartCrouching(const FInputActionValue& Value);
@@ -90,12 +90,12 @@ protected:
 	void StartSliding();
 	void StopSliding();
 	void HandleSliding(float DeltaTime);
-	//Ä³¸¯ÅÍ ¼Óµµ °»½Å ÇÔ¼ö
+	//ìºë¦­í„° ì†ë„ ê°±ì‹  í•¨ìˆ˜
 	void UpdateCharacterSpeed();
-	//Ä³¸¯ÅÍ Á¡ÇÁ ÇÔ¼ö
+	//ìºë¦­í„° ì í”„ í•¨ìˆ˜
 	void StartJump();
 	void EndJump();
-	//Ä³¸¯ÅÍ ½½¶óÀÌµù
+	//ìºë¦­í„° ìŠ¬ë¼ì´ë”©
 	void Landed(const FHitResult& Hit) override;
 	bool CanSlide() const;
 	FVector SlideDirection;
