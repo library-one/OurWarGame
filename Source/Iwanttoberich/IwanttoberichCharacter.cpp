@@ -21,19 +21,19 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 AIwanttoberichCharacter::AIwanttoberichCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	//º¯¼ö ÃÊ±âÈ­
+	//ë³€ìˆ˜ ì´ˆê¸°í™”
 	WalkSpeed = 600.f;
 	RunSpeed = 1000.f;
 	CrouchSpeed = 300.f;
 	SlideSpeed = 1200.f;
-	SlideDuration = 0.75f; // ½½¶óÀÌµù Áö¼Ó ½Ã°£(ÃÊ);
+	SlideDuration = 0.75f; // ìŠ¬ë¼ì´ë”© ì§€ì† ì‹œê°„(ì´ˆ);
 	bIsRunning = false;
 	bIsCrouching = false;
 	bIsSliding = false;
 	bIsJumping = false;
 	JumpStartSpeed = 0.0f;
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
-	//±âº» Ä³¸¯ÅÍ ¼Óµµ ¼³Á¤ 
+	//ê¸°ë³¸ ìºë¦­í„° ì†ë„ ì„¤ì • 
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -68,7 +68,7 @@ void AIwanttoberichCharacter::Tick(float DeltaTime)
 		MaintainJumpSpeed(DeltaTime);
 	}
 
-	//½½¶óÀÌµù ¿©ºÎ¿¡ µû¶ó ½Ã°£ Àü´Ş
+	//ìŠ¬ë¼ì´ë”© ì—¬ë¶€ì— ë”°ë¼ ì‹œê°„ ì „ë‹¬
 	if (bIsSliding) {
 		HandleSliding(DeltaTime);
 	}
@@ -91,15 +91,15 @@ void AIwanttoberichCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AIwanttoberichCharacter::Look);
 		
-		// ´Ş¸®±â ¾×¼Ç
+		// ë‹¬ë¦¬ê¸° ì•¡ì…˜
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AIwanttoberichCharacter::StopRunning);
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &AIwanttoberichCharacter::StartRunning);
 
-		// ¿õÅ©¸®±â ¾×¼Ç
+		// ì›…í¬ë¦¬ê¸° ì•¡ì…˜
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AIwanttoberichCharacter::StartCrouching);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AIwanttoberichCharacter::StopCrouching);
 
-		// ½½¶óÀÌµù ¾×¼Ç
+		// ìŠ¬ë¼ì´ë”© ì•¡ì…˜
 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Started, this, &AIwanttoberichCharacter::StartSliding);
 	}
 	else
@@ -138,11 +138,11 @@ void AIwanttoberichCharacter::StartJump()
 {
 	if (!bIsJumping)
 	{
-		// Á¡ÇÁ ½ÃÀÛ ½Ã ÇöÀç ¼Óµµ ÀúÀå
+		// ì í”„ ì‹œì‘ ì‹œ í˜„ì¬ ì†ë„ ì €ì¥
 		JumpStartSpeed = GetCharacterMovement()->Velocity.Size();
 		bIsJumping = true;
 
-		// Á¡ÇÁ¸¦ ½ÃÀÛÇÕ´Ï´Ù
+		// ì í”„ë¥¼ ì‹œì‘í•©ë‹ˆë‹¤
 		ACharacter::Jump();
 	}
 }
@@ -150,7 +150,7 @@ void AIwanttoberichCharacter::EndJump()
 {
 	if (bIsJumping)
 	{
-		// Á¡ÇÁ°¡ ³¡³ª¸é ¼Óµµ º¹¿ø
+		// ì í”„ê°€ ëë‚˜ë©´ ì†ë„ ë³µì›
 		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.GetSafeNormal() * JumpStartSpeed;
 		bIsJumping = false;
 	}
@@ -159,7 +159,7 @@ void AIwanttoberichCharacter::MaintainJumpSpeed(float DeltaTime)
 {
 	if (GetCharacterMovement()->IsFalling())
 	{
-		// Á¡ÇÁ Áß ¼Óµµ À¯Áö
+		// ì í”„ ì¤‘ ì†ë„ ìœ ì§€
 		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.GetSafeNormal() * JumpStartSpeed;
 	}
 }
@@ -204,10 +204,10 @@ void AIwanttoberichCharacter::StartSliding()
 	{
 		bIsSliding = true;
 		SlideStartTime = GetWorld()->GetTimeSeconds();
-		SlideInitialSpeed = GetCharacterMovement()->IsFalling() ? 1300.0f : 1200.0f;
+		SlideInitialSpeed = GetCharacterMovement()->IsFalling()&&GetCharacterMovement()->MaxWalkSpeed==1000 ? 1300.0f : 1200.0f;
 		GetCharacterMovement()->MaxWalkSpeed = SlideInitialSpeed;
 
-		// ½½¶óÀÌµù ¹æÇâ ¼³Á¤
+		// ìŠ¬ë¼ì´ë”© ë°©í–¥ ì„¤ì •
 		SlideDirection = GetVelocity().GetSafeNormal();
 		GetCharacterMovement()->Velocity = SlideDirection * SlideInitialSpeed;
 	}
@@ -223,19 +223,19 @@ void AIwanttoberichCharacter::HandleSliding(float DeltaTime)
 {
 	float ElapsedTime = GetWorld()->GetTimeSeconds() - SlideStartTime;
 
-	// ½½¶óÀÌµù ½Ã°£ °è»ê
+	// ìŠ¬ë¼ì´ë”© ì‹œê°„ ê³„ì‚°
 	if (ElapsedTime >= SlideDuration)
 	{
 		StopSliding();
 		return;
 	}
 
-	// ½½¶óÀÌµù Áß ¼Óµµ °¨¼Ò
+	// ìŠ¬ë¼ì´ë”© ì¤‘ ì†ë„ ê°ì†Œ
 	float Alpha = ElapsedTime / SlideDuration;
 	float CurrentSpeed = FMath::Lerp(SlideInitialSpeed, SlideEndSpeed, Alpha);
 	GetCharacterMovement()->MaxWalkSpeed = CurrentSpeed;
 
-	// ¹æÇâ °íÁ¤ (½½¶óÀÌµù Áß¿¡´Â ¹æÇâ ÀüÈ¯ ºÒ°¡)
+	// ë°©í–¥ ê³ ì • (ìŠ¬ë¼ì´ë”© ì¤‘ì—ëŠ” ë°©í–¥ ì „í™˜ ë¶ˆê°€)
 	FVector NewVelocity = SlideDirection * CurrentSpeed;
 	GetCharacterMovement()->Velocity = NewVelocity;
 }
@@ -270,7 +270,7 @@ void AIwanttoberichCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	//ÂøÁö ÈÄ ½½¶óÀÌµù ¹ßµ¿
+	//ì°©ì§€ í›„ ìŠ¬ë¼ì´ë”© ë°œë™
 	if (bIsSliding)
 	{
 		StartSliding();
